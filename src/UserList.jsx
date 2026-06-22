@@ -1,18 +1,31 @@
-import { useEffect } from "react";
-import { userDataStore } from "./userDataStore"
+import React, { useEffect } from 'react';
+import { useUserStore } from './userStore'; // Import your store
 
+const UserList = () => {
+  // Extract state and actions using selectors
+  const users = useUserStore((state) => state.users);
+  const isLoading = useUserStore((state) => state.isLoading);
+  const error = useUserStore((state) => state.error);
+  const fetchUsers = useUserStore((state) => state.fetchUsers);
 
-export default function UserList(props) {
-    const { data, isLoading, error, fetchUsers } = userDataStore();
-    useEffect(() => {
-        fetchUsers("https://jsonplaceholder.typicode.com/posts")
-    }, [fetchUsers]);
-    if (isLoading) return <h1>Loading results.........</h1>
-    if (error) return <p>Error:{error}</p>
-    return <>
-        <ul>
-        {
-                data.map(user => <li key={user.id}>{user.id}&nbsp;{user.title}<br />{ user.body}<br/></li>)
-        }</ul>
-    </>
-}
+  // Trigger the API call on mount
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  if (isLoading) return <p>Loading users...</p>;
+  if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
+
+  return (
+    <div>
+      <h2>User List</h2>
+      <ul>
+        {users.map((user) => (
+          <li key={user.id}>{user.title}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default UserList;
